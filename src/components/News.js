@@ -1,21 +1,23 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import LoadingIcon from "./LoadingIcon";
 import NewsItem from "./NewsItem";
 import PropTypes from 'prop-types';
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const News =(props)=> {
+const News = (props) => {
 
     const [articles, setArticles] = useState([]);
+    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     const [totalResults, setTotalResults] = useState('');
     const [page, setPage] = useState(0);
 
-// document.title = capitalize(props.category) + ' - NewsMonkey';
     
-useEffect(() => {
-    switchScreen(1);
-}, [])
+    useEffect(() => {
+        switchScreen(1);
+        document.title = capitalize(props.category) + ' - NewsMonkey';
+        // eslint-disable-next-line
+    }, [])
 
     const capitalize = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -30,7 +32,7 @@ useEffect(() => {
         let newParsedData = await newData.json();
         props.setProgress(70);
         setArticles(newParsedData.articles);
-        setPage(page+value);
+        setPage(page + value);
         setTotalResults(newParsedData.totalResults);
         props.setProgress(100);
     }
@@ -40,43 +42,39 @@ useEffect(() => {
         let newData = await fetch(newUrl);
         let newParsedData = await newData.json();
         setArticles(articles.concat(newParsedData.articles));
-        setPage(page+1)
+        setPage(page + 1)
     }
 
-        return (
-            <>
-                <h1 className='text-center' style={{ margin: 30 }}>Top Headlines - {props.category === 'General' ? 'Home' : props.category}</h1>
-                <InfiniteScroll
-                    dataLength={articles.length}
-                    next={fetchMoreData}
-                    hasMore={totalResults !== articles.length}
-                    loader={<LoadingIcon />}
-                >
-                    <div className="container">
-                        <div className="row">
-                            {!loading && articles.map((element) => {
-                                var title = '';
-                                var description = '';
-                                var desc = element.description ? JSON.stringify(element.description) : 'Click below to read more';
+    return (
+        <>
+            <h1 className='text-center' style={{ margin: 20, marginTop: 80 }}>Top Headlines - {props.category === 'General' ? 'Home' : props.category}</h1>
+            <InfiniteScroll
+                dataLength={articles.length}
+                next={fetchMoreData}
+                hasMore={totalResults !== articles.length}
+                loader={<LoadingIcon />}
+            >
+                <div className="container">
+                    <div className="row">
+                        {!loading && articles.map((element) => {
+                            var title = '';
+                            var description = '';
+                            var desc = element.description ? JSON.stringify(element.description) : 'Click below to read more';
 
-                                element.title.length > 55
-                                    ? title = element.title.slice(0, 55) + '...'
-                                    : title = element.title
+                            title = element.title;
 
-                                desc.length > 88
-                                    ? description = desc.slice(0, 88) + '...'
-                                    : description = desc
+                            description = desc;
 
-                                return <div key={element.url} className="col-md-4 my-3">
-                                    <NewsItem color={props.color} title={title} description={description} imageUrl={element.urlToImage} newsUrl={element.url} date={element.publishedAt} source={element.source.name} />
-                                </div>
-                            })}
-                        </div>
+                            return <div key={element.url} className="col-md-4 my-3">
+                                <NewsItem color={props.color} title={title} description={description} imageUrl={element.urlToImage} newsUrl={element.url} date={element.publishedAt} source={element.source.name} />
+                            </div>
+                        })}
                     </div>
-                </InfiniteScroll>
-            </>
-        );
-    
+                </div>
+            </InfiniteScroll>
+        </>
+    );
+
 }
 
 
